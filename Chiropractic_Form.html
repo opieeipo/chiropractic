@@ -187,34 +187,8 @@
             const container = document.getElementById('services-container');
             const newServiceDiv = document.createElement('div');
             newServiceDiv.innerHTML = serviceHtml;
-            container.appendChild(newServiceDiv.firstChild);
+            // The corrected line:
+            container.appendChild(newServiceDiv.firstElementChild);
             serviceCount++;
         } else {
-            alert('Maximum of 10 service line items reached.');
-        }
-    }
-
-    // A function to automatically fill the price when a code is selected
-    function updatePrice(selectElement) {
-        const priceInput = selectElement.closest('.service-item').querySelector('.price-input');
-        const selectedOption = selectElement.options[selectElement.selectedIndex];
-        const price = selectedOption.getAttribute('data-price');
-        priceInput.value = price;
-        calculateSubtotal();
-    }
-
-    // A function to calculate the total price of all services
-    function calculateSubtotal() {
-        const priceInputs = document.querySelectorAll('.price-input');
-        let subtotal = 0;
-        priceInputs.forEach(input => {
-            subtotal += parseFloat(input.value) || 0;
-        });
-        document.getElementById('subtotal').innerText = '₱' + subtotal.toFixed(2);
-    }
-
-    // Initial calculation on page load
-    document.addEventListener('DOMContentLoaded', calculateSubtotal);
-</script>
-</body>
-</html>
+            alert('Maximum of 10 service line items reached
