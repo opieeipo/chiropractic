@@ -86,4 +86,152 @@
             </div>
 
             <div class="flex flex-col">
-                <label for="serviceDate" class="text-slate-700 font-semibold mb-1
+                <label for="serviceDate" class="text-slate-700 font-semibold mb-1">Date of Service</label>
+                <input type="date" id="serviceDate" name="serviceDate" class="p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+            </div>
+        </div>
+
+        <div id="services-container" class="mt-6">
+            <h3 class="text-xl font-bold text-slate-800 mb-4 border-b-2 border-slate-300 pb-2">Services Rendered</h3>
+            <div class="service-item grid grid-cols-1 md:grid-cols-3 gap-4 mb-4 items-end line-item-input">
+                <div class="flex flex-col md:col-span-2">
+                    <label class="text-slate-700 font-semibold mb-1">Diagnosis Code & Procedure Code</label>
+                    <select class="p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white code-select">
+                        <option value="" data-price="0" disabled selected>Select a code...</option>
+                        <optgroup label="Diagnosis Codes (ICD-10)">
+                            <option value="M54.5" data-price="0">M54.5 - Low back pain</option>
+                            <option value="M99.01" data-price="0">M99.01 - Seg. & somatic dysfunction of cervical region</option>
+                            <option value="M99.02" data-price="0">M99.02 - Seg. & somatic dysfunction of thoracic region</option>
+                            <option value="M99.03" data-price="0">M99.03 - Seg. & somatic dysfunction of lumbar region</option>
+                            <option value="M54.2" data-price="0">M54.2 - Cervicalgia (Neck pain)</option>
+                            <option value="G44.3" data-price="0">G44.3 - Chronic post-traumatic headache</option>
+                            <option value="M25.511" data-price="0">M25.511 - Pain in right shoulder</option>
+                        </optgroup>
+                        <optgroup label="Procedure Codes (CPT)">
+                            <option value="98940" data-price="2750">98940 - Chiropractic manipulative treatment, one to two regions</option>
+                            <option value="98941" data-price="4125">98941 - Chiropractic manipulative treatment, three to four regions</option>
+                            <option value="98942" data-price="5500">98942 - Chiropractic manipulative treatment, five regions</option>
+                            <option value="97140" data-price="2200">97140 - Manual therapy techniques (e.g., myofascial release, joint mobilization)</option>
+                            <option value="97012" data-price="1375">97012 - Application of a modality, traction</option>
+                            <option value="97014" data-price="1100">97014 - Application of a modality, electrical stimulation (unattended)</option>
+                        </optgroup>
+                    </select>
+                </div>
+                <div class="flex flex-col">
+                    <label class="text-slate-700 font-semibold mb-1">Price (₱)</label>
+                    <input type="number" step="0.01" class="price-input p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="0.00">
+                </div>
+            </div>
+        </div>
+
+        <button id="add-service-btn" class="no-print mt-2 px-4 py-2 bg-slate-800 text-white rounded-lg hover:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-slate-500">Add Service</button>
+
+        <div class="mt-8 pt-4 border-t-2 border-slate-300">
+            <div class="flex justify-end items-center">
+                <p class="text-xl font-bold text-slate-800 mr-4">Subtotal:</p>
+                <p id="subtotal" class="text-2xl font-bold text-blue-600">₱0.00</p>
+            </div>
+        </div>
+
+        <div class="mt-6 md:col-span-2 flex flex-col">
+            <label for="notes" class="text-slate-700 font-semibold mb-1">Additional Notes</label>
+            <textarea id="notes" name="notes" rows="4" class="p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Add any relevant notes here..."></textarea>
+        </div>
+
+        <div class="mt-8 pt-4 border-t-2 border-slate-300 text-center text-sm text-slate-500">
+            <p>&copy; 2025 Elite Chiropractic. All Rights Reserved.</p>
+        </div>
+
+    </div>
+
+<script>
+    const MAX_SERVICES = 10;
+    let serviceCount = 1;
+
+    // The HTML for a new service line item
+    const serviceHtml = `
+        <div class="service-item grid grid-cols-1 md:grid-cols-3 gap-4 mb-4 items-end line-item-input">
+            <div class="flex flex-col md:col-span-2">
+                <label class="text-slate-700 font-semibold mb-1">Diagnosis Code & Procedure Code</label>
+                <select class="p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white code-select">
+                    <option value="" data-price="0" disabled selected>Select a code...</option>
+                    <optgroup label="Diagnosis Codes (ICD-10)">
+                        <option value="M54.5" data-price="0">M54.5 - Low back pain</option>
+                        <option value="M99.01" data-price="0">M99.01 - Seg. & somatic dysfunction of cervical region</option>
+                        <option value="M99.02" data-price="0">M99.02 - Seg. & somatic dysfunction of thoracic region</option>
+                        <option value="M99.03" data-price="0">M99.03 - Seg. & somatic dysfunction of lumbar region</option>
+                        <option value="M54.2" data-price="0">M54.2 - Cervicalgia (Neck pain)</option>
+                        <option value="G44.3" data-price="0">G44.3 - Chronic post-traumatic headache</option>
+                        <option value="M25.511" data-price="0">M25.511 - Pain in right shoulder</option>
+                    </optgroup>
+                    <optgroup label="Procedure Codes (CPT)">
+                        <option value="98940" data-price="2750">98940 - Chiropractic manipulative treatment, one to two regions</option>
+                        <option value="98941" data-price="4125">98941 - Chiropractic manipulative treatment, three to four regions</option>
+                        <option value="98942" data-price="5500">98942 - Chiropractic manipulative treatment, five regions</option>
+                        <option value="97140" data-price="2200">97140 - Manual therapy techniques (e.g., myofascial release, joint mobilization)</option>
+                        <option value="97012" data-price="1375">97012 - Application of a modality, traction</option>
+                        <option value="97014" data-price="1100">97014 - Application of a modality, electrical stimulation (unattended)</option>
+                    </optgroup>
+                </select>
+            </div>
+            <div class="flex flex-col">
+                <label class="text-slate-700 font-semibold mb-1">Price (₱)</label>
+                <input type="number" step="0.01" class="price-input p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="0.00">
+            </div>
+        </div>
+    `;
+
+    // A function to add a new service line item up to the maximum limit
+    function addService() {
+        if (serviceCount < MAX_SERVICES) {
+            const container = document.getElementById('services-container');
+            const newServiceDiv = document.createElement('div');
+            newServiceDiv.innerHTML = serviceHtml;
+            container.appendChild(newServiceDiv.firstElementChild);
+            serviceCount++;
+        } else {
+            alert('Maximum of 10 service line items reached.');
+        }
+    }
+
+    // A function to automatically fill the price and calculate the total
+    function updatePrice(selectElement) {
+        const priceInput = selectElement.closest('.service-item').querySelector('.price-input');
+        const selectedOption = selectElement.options[selectElement.selectedIndex];
+        const price = selectedOption.getAttribute('data-price');
+        priceInput.value = price;
+        calculateSubtotal();
+    }
+
+    // A function to calculate the total price of all services
+    function calculateSubtotal() {
+        const priceInputs = document.querySelectorAll('.price-input');
+        let subtotal = 0;
+        priceInputs.forEach(input => {
+            subtotal += parseFloat(input.value) || 0;
+        });
+        document.getElementById('subtotal').innerText = '₱' + subtotal.toFixed(2);
+    }
+    
+    // Attach event listeners after the functions have been defined
+    document.addEventListener('DOMContentLoaded', () => {
+        const addButton = document.getElementById('add-service-btn');
+        if (addButton) {
+            addButton.addEventListener('click', addService);
+        }
+    });
+
+    document.addEventListener('change', (event) => {
+        if (event.target.classList.contains('code-select')) {
+            updatePrice(event.target);
+        }
+    });
+
+    document.addEventListener('input', (event) => {
+        if (event.target.classList.contains('price-input')) {
+            calculateSubtotal();
+        }
+    });
+</script>
+</body>
+</html>
