@@ -15,27 +15,27 @@
         /* --- Print-specific styles --- */
         @media print {
             body {
-                background-color: #ffffff; /* White background for printing */
+                background-color: #ffffff;
                 padding: 0;
             }
 
             .no-print {
-                display: none; /* Hide elements you don't want to print, like buttons or input fields */
+                display: none;
             }
 
             input, select, textarea {
-                border: none; /* Remove borders from form fields */
-                border-bottom: 1px solid #000; /* Add a bottom border for a clean, fillable line */
-                background-color: transparent; /* Transparent background */
+                border: none;
+                border-bottom: 1px solid #000;
+                background-color: transparent;
                 padding: 0;
-                margin-bottom: 1rem; /* Space out the fields */
-                -webkit-print-color-adjust: exact; /* Ensure colors print correctly */
+                margin-bottom: 1rem;
+                -webkit-print-color-adjust: exact;
             }
 
             select {
                 -webkit-appearance: none;
                 -moz-appearance: none;
-                appearance: none; /* Remove dropdown arrow on printed document */
+                appearance: none;
             }
 
             .bg-white, .shadow-2xl, .border-4 {
@@ -84,38 +84,46 @@
                 <label for="serviceDate" class="text-slate-700 font-semibold mb-1">Date of Service</label>
                 <input type="date" id="serviceDate" name="serviceDate" class="p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
             </div>
+        </div>
 
-            <div class="flex flex-col md:col-span-2">
-                <label for="diagnosisCode" class="text-slate-700 font-semibold mb-1">Diagnosis Code (ICD-10)</label>
-                <select id="diagnosisCode" name="diagnosisCode" class="p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white">
-                    <option value="" disabled selected>Select a diagnosis code...</option>
-                    <option value="M54.5">M54.5 - Low back pain</option>
-                    <option value="M99.01">M99.01 - Segmental and somatic dysfunction of cervical region</option>
-                    <option value="M99.02">M99.02 - Segmental and somatic dysfunction of thoracic region</option>
-                    <option value="M99.03">M99.03 - Segmental and somatic dysfunction of lumbar region</option>
-                    <option value="M54.2">M54.2 - Cervicalgia (Neck pain)</option>
-                    <option value="G44.3">G44.3 - Chronic post-traumatic headache</option>
-                    <option value="M25.511">M25.511 - Pain in right shoulder</option>
-                </select>
+        <div id="services-container" class="mt-6">
+            <h3 class="text-xl font-bold text-slate-800 mb-4 border-b-2 border-slate-300 pb-2">Services Rendered</h3>
+            <div class="service-item grid grid-cols-1 md:grid-cols-3 gap-4 mb-4 items-end">
+                <div class="flex flex-col md:col-span-2">
+                    <label class="text-slate-700 font-semibold mb-1">Diagnosis Code & Procedure Code</label>
+                    <select class="p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white code-select" onchange="updatePrice(this)">
+                        <option value="" data-price="0" disabled selected>Select a code...</option>
+                        <optgroup label="Diagnosis Codes (ICD-10)">
+                            <option value="M54.5" data-price="0">M54.5 - Low back pain</option>
+                            <option value="M99.01" data-price="0">M99.01 - Seg. & somatic dysfunction of cervical region</option>
+                            <option value="M99.02" data-price="0">M99.02 - Seg. & somatic dysfunction of thoracic region</option>
+                        </optgroup>
+                        <optgroup label="Procedure Codes (CPT)">
+                            <option value="98940" data-price="50">98940 - Chiropractic manipulative treatment, one to two regions</option>
+                            <option value="98941" data-price="75">98941 - Chiropractic manipulative treatment, three to four regions</option>
+                            <option value="98942" data-price="100">98942 - Chiropractic manipulative treatment, five regions</option>
+                            <option value="97140" data-price="40">97140 - Manual therapy techniques</option>
+                        </optgroup>
+                    </select>
+                </div>
+                <div class="flex flex-col">
+                    <label class="text-slate-700 font-semibold mb-1">Price ($)</label>
+                    <input type="number" step="0.01" class="price-input p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="0.00" oninput="calculateSubtotal()">
+                </div>
             </div>
+            <button onclick="addService()" class="no-print mt-2 px-4 py-2 bg-slate-800 text-white rounded-lg hover:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-slate-500">Add Service</button>
+        </div>
 
-            <div class="flex flex-col md:col-span-2">
-                <label for="procedureCode" class="text-slate-700 font-semibold mb-1">Procedure Code (CPT)</label>
-                <select id="procedureCode" name="procedureCode" class="p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white">
-                    <option value="" disabled selected>Select a procedure code...</option>
-                    <option value="98940">98940 - Chiropractic manipulative treatment, one to two regions</option>
-                    <option value="98941">98941 - Chiropractic manipulative treatment, three to four regions</option>
-                    <option value="98942">98942 - Chiropractic manipulative treatment, five regions</option>
-                    <option value="97140">97140 - Manual therapy techniques (e.g., myofascial release, joint mobilization)</option>
-                    <option value="97012">97012 - Application of a modality, traction</option>
-                    <option value="97014">97014 - Application of a modality, electrical stimulation (unattended)</option>
-                </select>
+        <div class="mt-8 pt-4 border-t-2 border-slate-300">
+            <div class="flex justify-end items-center">
+                <p class="text-xl font-bold text-slate-800 mr-4">Subtotal:</p>
+                <p id="subtotal" class="text-2xl font-bold text-blue-600">$0.00</p>
             </div>
+        </div>
 
-            <div class="md:col-span-2 flex flex-col">
-                <label for="notes" class="text-slate-700 font-semibold mb-1">Additional Notes</label>
-                <textarea id="notes" name="notes" rows="4" class="p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Add any relevant notes here..."></textarea>
-            </div>
+        <div class="mt-6 md:col-span-2 flex flex-col">
+            <label for="notes" class="text-slate-700 font-semibold mb-1">Additional Notes</label>
+            <textarea id="notes" name="notes" rows="4" class="p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Add any relevant notes here..."></textarea>
         </div>
 
         <div class="mt-8 pt-4 border-t-2 border-slate-300 text-center text-sm text-slate-500">
@@ -124,5 +132,59 @@
 
     </div>
 
+<script>
+    // A function to add a new service line item
+    function addService() {
+        const container = document.getElementById('services-container');
+        const newService = document.createElement('div');
+        newService.classList.add('service-item', 'grid', 'grid-cols-1', 'md:grid-cols-3', 'gap-4', 'mb-4', 'items-end');
+        newService.innerHTML = `
+            <div class="flex flex-col md:col-span-2">
+                <label class="text-slate-700 font-semibold mb-1">Diagnosis Code & Procedure Code</label>
+                <select class="p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white code-select" onchange="updatePrice(this)">
+                    <option value="" data-price="0" disabled selected>Select a code...</option>
+                    <optgroup label="Diagnosis Codes (ICD-10)">
+                        <option value="M54.5" data-price="0">M54.5 - Low back pain</option>
+                        <option value="M99.01" data-price="0">M99.01 - Seg. & somatic dysfunction of cervical region</option>
+                        <option value="M99.02" data-price="0">M99.02 - Seg. & somatic dysfunction of thoracic region</option>
+                    </optgroup>
+                    <optgroup label="Procedure Codes (CPT)">
+                        <option value="98940" data-price="50">98940 - Chiropractic manipulative treatment, one to two regions</option>
+                        <option value="98941" data-price="75">98941 - Chiropractic manipulative treatment, three to four regions</option>
+                        <option value="98942" data-price="100">98942 - Chiropractic manipulative treatment, five regions</option>
+                        <option value="97140" data-price="40">97140 - Manual therapy techniques</option>
+                    </optgroup>
+                </select>
+            </div>
+            <div class="flex flex-col">
+                <label class="text-slate-700 font-semibold mb-1">Price ($)</label>
+                <input type="number" step="0.01" class="price-input p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="0.00" oninput="calculateSubtotal()">
+            </div>
+        `;
+        container.insertBefore(newService, container.querySelector('.no-print'));
+    }
+
+    // A function to automatically fill the price when a code is selected
+    function updatePrice(selectElement) {
+        const priceInput = selectElement.closest('.service-item').querySelector('.price-input');
+        const selectedOption = selectElement.options[selectElement.selectedIndex];
+        const price = selectedOption.getAttribute('data-price');
+        priceInput.value = price;
+        calculateSubtotal();
+    }
+
+    // A function to calculate the total price of all services
+    function calculateSubtotal() {
+        const priceInputs = document.querySelectorAll('.price-input');
+        let subtotal = 0;
+        priceInputs.forEach(input => {
+            subtotal += parseFloat(input.value) || 0;
+        });
+        document.getElementById('subtotal').innerText = '$' + subtotal.toFixed(2);
+    }
+
+    // Initial calculation on page load
+    document.addEventListener('DOMContentLoaded', calculateSubtotal);
+</script>
 </body>
 </html>
